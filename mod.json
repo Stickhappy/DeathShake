@@ -1,0 +1,54 @@
+{
+    "geode": "5.11.2",
+    "gd": {
+        "win": "2.2081",
+        "android": "2.2081",
+        "mac": "2.2081",
+        "ios": "2.2081"
+    },
+    "id": "stick.deathshake",
+    "name": "DeathShake",
+    "version": "v1.0.0",
+    "developer": "Stick",
+    "description": "Adds a customizable camera shake effect whenever you crash.",
+    "settings": {
+        "enabled": {
+            "name": "Shake",
+            "description": "Enable or disable the camera shake effect when crashing.",
+            "type": "bool",
+            "default": true
+        },
+        "speed": {
+            "name": "Speed of Shake",
+            "description": "Controls how fast the camera shake plays.",
+            "type": "float",
+            "default": 1.0,
+            "min": 0.2,
+            "max": 3.0,
+            "enable-if": "enabled"
+        },
+        "intensity": {
+            "name": "Shake Intensity",
+            "description": "Distance in pixels the camera moves on crash.",
+            "type": "float",
+            "default": 8.0,
+            "min": 1.0,
+            "max": 30.0,
+            "enable-if": "enabled"
+        },
+        "rotation": {
+            "name": "Camera Rotation",
+            "description": "Adds a slight camera tilt during the shake.",
+            "type": "bool",
+            "default": true,
+            "enable-if": "enabled"
+        },
+        "practice": {
+            "name": "Practice Mode",
+            "description": "Trigger camera shake in Practice Mode.",
+            "type": "bool",
+            "default": true,
+            "enable-if": "enabled"
+        }
+    }
+}
