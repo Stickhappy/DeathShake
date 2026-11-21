@@ -3,14 +3,28 @@
 #include <Geode/modify/PauseLayer.hpp>
 #include <Geode/ui/GeodeUI.hpp>
 
-using namespace geode::prelude;
 
-constexpr int SHAKE_ACTION_TAG = 8472;
+// if yall you think that is vibecode, dm me my user is idzito on dc ill explain how it works
+
+namespace {
+    constexpr int SHAKE_TAG = 8472;
+
+    struct ShakeStep {
+        float x;
+        float y;
+        float rot;
+    };
+}
 
 class $modify(ShakePlayLayer, PlayLayer) {
+    void resetShake() {
+        this->stopActionByTag(SHAKE_TAG);
+        this->setPosition({ 0.f, 0.f });
+        this->setRotation(0.f);
+    }
+
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         bool wasDead = player->m_isDead;
-
         PlayLayer::destroyPlayer(player, object);
 
         if (!wasDead && player->m_isDead) {
@@ -18,52 +32,48 @@ class $modify(ShakePlayLayer, PlayLayer) {
         }
     }
 
+    void resetLevel() {
+        this->resetShake();
+        PlayLayer::resetLevel();
+    }
+
+    void onQuit() {
+        this->resetShake();
+        PlayLayer::onQuit();
+    }
+
     void triggerDeathShake() {
         auto mod = Mod::get();
         if (!mod->getSettingValue<bool>("enabled")) return;
         if (this->m_isPracticeMode && !mod->getSettingValue<bool>("practice")) return;
 
-        this->stopActionByTag(SHAKE_ACTION_TAG);
-        this->setPosition({ 0.f, 0.f });
-        this->setRotation(0.f);
+        this->resetShake();
 
         float intensity = static_cast<float>(mod->getSettingValue<double>("intensity"));
-        float speed = static_cast<float>(mod->getSettingValue<double>("speed"));
-        if (speed <= 0.05f) speed = 0.05f;
+        float speed = std::max(0.05f, static_cast<float>(mod->getSettingValue<double>("speed")));
         float stepTime = 0.025f / speed;
-        bool useRotation = mod->getSettingValue<bool>("rotation");
-        float rot = useRotation ? (intensity * 0.12f) : 0.f;
+        float rotFactor = mod->getSettingValue<bool>("rotation") ? (intensity * 0.12f) : 0.f;
 
-        auto sequence = CCSequence::create(
-            CCSpawn::createWithTwoActions(
-                CCMoveTo::create(stepTime, { -intensity, intensity * 0.7f }),
-                CCRotateTo::create(stepTime, -rot)
-            ),
-            CCSpawn::createWithTwoActions(
-                CCMoveTo::create(stepTime, { intensity, -intensity * 0.8f }),
-                CCRotateTo::create(stepTime, rot)
-            ),
-            CCSpawn::createWithTwoActions(
-                CCMoveTo::create(stepTime, { -intensity * 0.6f, -intensity * 0.5f }),
-                CCRotateTo::create(stepTime, -rot * 0.6f)
-            ),
-            CCSpawn::createWithTwoActions(
-                CCMoveTo::create(stepTime, { intensity * 0.5f, intensity * 0.4f }),
-                CCRotateTo::create(stepTime, rot * 0.5f)
-            ),
-            CCSpawn::createWithTwoActions(
-                CCMoveTo::create(stepTime, { -intensity * 0.25f, intensity * 0.2f }),
-                CCRotateTo::create(stepTime, -rot * 0.25f)
-            ),
-            CCSpawn::createWithTwoActions(
-                CCMoveTo::create(stepTime, { 0.f, 0.f }),
-                CCRotateTo::create(stepTime, 0.f)
-            ),
-            nullptr
-        );
+        const ShakeStep steps[] = {
+            { -intensity,        intensity * 0.7f, -rotFactor },
+            {  intensity,       -intensity * 0.8f,  rotFactor },
+            { -intensity * 0.6f, -intensity * 0.5f, -rotFactor * 0.6f },
+            {  intensity * 0.5f,  intensity * 0.4f,  rotFactor * 0.5f },
+            { -intensity * 0.25f, intensity * 0.2f, -rotFactor * 0.25f },
+            {  0.f,              0.f,               0.f }
+        };
 
-        sequence->setTag(SHAKE_ACTION_TAG);
-        this->runAction(sequence);
+        CCArray* actions = CCArray::create();
+        for (const auto& step : steps) {
+            actions->addObject(CCSpawn::createWithTwoActions(
+                CCMoveTo::create(stepTime, { step.x, step.y }),
+                CCRotateTo::create(stepTime, step.rot)
+            ));
+        }
+
+        auto seq = CCSequence::create(actions);
+        seq->setTag(SHAKE_TAG);
+        this->runAction(seq);
     }
 };
 
@@ -85,18 +95,9 @@ class $modify(ShakePauseLayer, PauseLayer) {
         );
         button->setID("death-shake-settings-btn"_spr);
 
-        if (auto rightMenu = this->getChildByID("right-button-menu")) {
-            rightMenu->addChild(button);
-            rightMenu->updateLayout();
-        } else if (auto leftMenu = this->getChildByID("left-button-menu")) {
-            leftMenu->addChild(button);
-            leftMenu->updateLayout();
-        } else {
-            auto winSize = CCDirector::sharedDirector()->getWinSize();
-            auto menu = CCMenu::create();
-            menu->setPosition({ winSize.width - 35.f, 35.f });
+        if (auto menu = this->getChildByID("right-button-menu")) {
             menu->addChild(button);
-            this->addChild(menu);
+            menu->updateLayout();
         }
     }
 
