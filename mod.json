@@ -8,7 +8,7 @@
     },
     "id": "stick.deathshake",
     "name": "DeathShake",
-    "version": "v1.0.0",
+    "version": "v1.0.1",
     "developer": "Stick",
     "description": "Adds a customizable camera shake effect whenever you crash.",
     "links": {
