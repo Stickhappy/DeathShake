@@ -2,9 +2,12 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PauseLayer.hpp>
 #include <Geode/ui/GeodeUI.hpp>
+#include <algorithm>
 
+// if yall think is vibecode dm me on discord my user is idzito
 
-// if yall you think that is vibecode, dm me my user is idzito on dc ill explain how it works
+using namespace geode::prelude;
+using namespace cocos2d;
 
 namespace {
     constexpr int SHAKE_TAG = 8472;
@@ -55,15 +58,15 @@ class $modify(ShakePlayLayer, PlayLayer) {
         float rotFactor = mod->getSettingValue<bool>("rotation") ? (intensity * 0.12f) : 0.f;
 
         const ShakeStep steps[] = {
-            { -intensity,        intensity * 0.7f, -rotFactor },
-            {  intensity,       -intensity * 0.8f,  rotFactor },
+            { -intensity,         intensity * 0.7f, -rotFactor },
+            {  intensity,        -intensity * 0.8f,  rotFactor },
             { -intensity * 0.6f, -intensity * 0.5f, -rotFactor * 0.6f },
             {  intensity * 0.5f,  intensity * 0.4f,  rotFactor * 0.5f },
             { -intensity * 0.25f, intensity * 0.2f, -rotFactor * 0.25f },
-            {  0.f,              0.f,               0.f }
+            {  0.f,               0.f,               0.f }
         };
 
-        CCArray* actions = CCArray::create();
+        auto actions = CCArray::create();
         for (const auto& step : steps) {
             actions->addObject(CCSpawn::createWithTwoActions(
                 CCMoveTo::create(stepTime, { step.x, step.y }),
