@@ -1,0 +1,13 @@
+﻿name: Build
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+
+jobs:
+  build:
+    uses: geode-sdk/build-geode-mod/.github/workflows/build.yml@main
+    with:
+      platforms: "win, mac, android32, android64"

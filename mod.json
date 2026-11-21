@@ -3,14 +3,18 @@
     "gd": {
         "win": "2.2081",
         "android": "2.2081",
-        "mac": "2.2081",
-        "ios": "2.2081"
+        "mac": "2.2081"
+        
     },
     "id": "stick.deathshake",
     "name": "DeathShake",
     "version": "v1.0.0",
     "developer": "Stick",
     "description": "Adds a customizable camera shake effect whenever you crash.",
+    "links": {
+        "source": "https://github.com/stickhappy/DeathShake"
+    },
+    "tags": ["gameplay", "enhancement"],
     "settings": {
         "enabled": {
             "name": "Shake",

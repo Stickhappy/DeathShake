@@ -1,6 +1,6 @@
 ﻿# DeathShake
 
-Adds a customizable **camera shake effect** whenever your icon crashes in Geometry Dash.
+Adds a customizable **camera shake effect** whenever your icon crashes in Geometry Dash., please join my youtube channel https://www.youtube.com/@MexballREAL
 
 ## Features
 - **Shake:** Enable or disable the death shake effect.
